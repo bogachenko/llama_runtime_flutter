@@ -29,3 +29,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+
+/example/linux/flutter/generated_*
+/example/macos/Flutter/GeneratedPluginRegistrant.swift
+/example/windows/flutter/generated_*
