@@ -7,6 +7,10 @@ import 'package:code_assets/code_assets.dart';
 
 void main(List<String> args) async {
   await build(args, (input, output) async {
+    if (!input.config.buildCodeAssets) {
+      return;
+    }
+
     final builder = CMakeBuilder.create(
       name: input.packageName,
       sourceDir: Directory.fromUri(input.packageRoot).uri,

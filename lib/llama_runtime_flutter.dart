@@ -10,6 +10,11 @@ import 'llama_runtime_flutter_bindings_generated.dart' as bindings;
 /// only do this for native functions which are guaranteed to be short-lived.
 int sum(int a, int b) => bindings.sum(a, b);
 
+/// Returns the number of GGML backend devices.
+Future<int> llamaRuntimeDeviceCount() {
+  return Isolate.run(bindings.llama_runtime_device_count);
+}
+
 /// A longer lived native function, which occupies the thread calling it.
 ///
 /// Do not call these kind of native functions in the main isolate. They will
@@ -106,3 +111,35 @@ Future<SendPort> _helperIsolateSendPort = () async {
   // can start sending requests.
   return completer.future;
 }();
+
+/// Starts the RPC server on the device's CPU.
+///
+/// The RPC protocol has no authentication.
+/// Only use this server on trusted networks.
+Future<void> startRpcServer({int port = 50052, int threads = 4}) async {
+  final result = await Isolate.run(
+    () => bindings.llama_runtime_rpc_server_start(port, threads),
+  );
+
+  if (result != 0) {
+    throw StateError('Failed to start RPC server: $result');
+  }
+}
+
+/// Stops the RPC server and releases its resources.
+Future<void> stopRpcServer() async {
+  final result = await Isolate.run(bindings.llama_runtime_rpc_server_stop);
+
+  if (result != 0) {
+    throw StateError('Failed to stop RPC server: $result');
+  }
+}
+
+/// Returns whether the RPC server is running.
+Future<bool> isRpcServerRunning() async {
+  final result = await Isolate.run(
+    bindings.llama_runtime_rpc_server_is_running,
+  );
+
+  return result == 1;
+}
